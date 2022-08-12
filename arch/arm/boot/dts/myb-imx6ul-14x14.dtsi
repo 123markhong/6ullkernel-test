@@ -104,7 +104,8 @@
            model = "wm8904-audio";                                                                                             
            cpu-dai = <&sai2>;                                                                                                  
            audio-codec = <&codec>;                                                                                             
-           asrc-controller = <&asrc>;                                                                                          
+           asrc-controller = <&asrc>;
+          // codec-master;                                                                                          
            gpr = <&gpr>;                                                                                                       
            audio-routing =                                                                                                     
                    "Headphone Jack", "HPOUTL",                                                                                 
@@ -114,6 +115,46 @@
                    "Mic Jack", "MICBIAS",                                                                                      
                    "IN1L", "Mic Jack";                                                                                         
     }; 
+
+/*
+	sound {
+                #address-cells = <1>;
+                #size-cells = <0>;
+                compatible = "simple-audio-card";
+	        model = "wm8904-audio";
+                simple-audio-card,widgets =
+                        "Headphone", "Headphone Jack",
+                        "Line", "Line Out Jack",
+                        "Microphone", "Microphone Jack",
+                        "Line", "Line In Jack";
+                simple-audio-card,routing =
+                        "Line Out Jack", "LINEOUTR",
+                        "Line Out Jack", "LINEOUTL",
+                        "Headphone Jack", "HPOUTR",
+                        "Headphone Jack", "HPOUTL",
+                        "IN1L", "Line In Jack",
+                        "IN1R", "Line In Jack",
+                        "Microphone Jack", "MICBIAS",
+                        "IN2L", "Microphone Jack",
+                        "IN2R", "Microphone Jack";
+                simple-audio-card,mclk-fs = <256>;
+
+                simple-audio-card,dai-link@0 {
+                        reg = <0>;
+                        bitclock-master = <&dailink0_master>;
+                        frame-master = <&dailink0_master>;
+                        format = "i2s";
+
+                        cpu {
+                                sound-dai = <&sai2>;
+                        };
+
+                        dailink0_master: codec {
+                                sound-dai = <&wm8904>;
+                        };
+          };
+	};
+*/
 
 };
 
@@ -139,6 +180,7 @@
 	status = "okay";
 
     codec: wm8904@1a {
+        #sound-dai-cells = <0>;
         compatible = "wlf,wm8904";
         reg = <0x1a>;
         clocks = <&clks IMX6UL_CLK_SAI2>;
@@ -146,6 +188,18 @@
         wlf,shared-lrclk;
     };
 
+/*
+    wm8904: audio-codec@1a {
+                #sound-dai-cells = <0>;
+                compatible = "wlf,wm8904";
+                reg = <0x1a>;
+          //      clocks = <&mclk>;
+                clocks = <&clks IMX6UL_CLK_SAI2>;
+                clock-names = "mclk";
+                //assigned-clocks = <&mclk>;
+                //assigned-clock-rates = <1250000>;
+        };
+*/    
     ft5x06: ft5x06@38 {                                                                                                         
         compatible = "edt,edt-ft5406", "edt,edt-ft5x06";                                                                        
             reg = <0x38>;                                                                                                       
